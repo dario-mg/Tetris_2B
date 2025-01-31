@@ -7,6 +7,7 @@ public class Spawner : MonoBehaviour
     public GameObject[] piecePrefabs;
     public GameObject blockPrefab;
     private List<GameObject> piecesPool = new List<GameObject>();
+    public static float fallSpeed = 1.0f;
 
     void Start()
     {
@@ -21,6 +22,8 @@ public class Spawner : MonoBehaviour
         ActivateNextPiece();
     }
 
+    // Activa la siguiente pieza
+
     public void ActivateNextPiece()
     {
         // Seleccionar una pieza aleatoria del pool
@@ -32,9 +35,8 @@ public class Spawner : MonoBehaviour
             piece = piecesPool[randomIndex];
         }
         // Activar la pieza seleccionada
-        piece.transform.position = new Vector3(5, 10, 0);
+        piece.transform.position = new Vector3(5, 16, 0);
         piece.SetActive(true);
         piece.GetComponent<Piece>().enabled = true;
-        Debug.Log("Activated new piece at position (5, 10)");
     }
 }

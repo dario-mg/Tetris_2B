@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
         spawner = Object.FindFirstObjectByType<Spawner>();
     }
 
+    // Inicializa la cuadrícula con bloques inactivos
     public static void InitializeGrid(GameObject blockPrefab)
     {
         for (int y = 0; y < h; y++)
@@ -28,33 +29,30 @@ public class Board : MonoBehaviour
                 grid[x, y] = block;
             }
         }
-        Debug.Log("Initialized grid");
     }
 
+    // Activa un bloque en la posición (x, y)
     public static void ActivateBlock(int x, int y)
     {
         if (grid[x, y] != null)
         {
-            Debug.Log("Activating block at " + x + ", " + y);
             grid[x, y].SetActive(true);
         }
     }
 
-    // Rounds Vector2 so does not have decimal values
-    // Used to force Integer coordinates (without decimals) when moving pieces
+    // Redondea un Vector2 para que no tenga valores decimales
     public static Vector2 RoundVector2(Vector2 v)
     {
         return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
     }
 
-    // TODO: Returns true if pos (x,y) is inside the grid, false otherwise
+    // Devuelve true si la posición (x, y) está dentro de la cuadrícula, false en caso contrario
     public static bool InsideBorder(Vector2 pos)
     {
         return pos.x >= 0 && pos.x < w && pos.y >= 0 && pos.y < h;
     }
 
-    // Deletes all GameObjects in the row Y and set the row cells to null.
-    // You can use Destroy function to delete the GameObjects.
+    // Elimina todos los GameObjects en la fila Y y establece las celdas de la fila en null
     public static void DeleteRow(int y)
     {
         for (int x = 0; x < w; ++x)
@@ -64,38 +62,34 @@ public class Board : MonoBehaviour
                 grid[x, y].SetActive(false);
             }
         }
-        Debug.Log("Deleted row " + y);
     }
 
-    // TODO: Moves all gameobject on row Y to row Y-1
-    // 2 thing change:
-    //  - All GameObjects on row Y go from cell (X,Y) to cell (X,Y-1)
-    //  - Changes the GameObject transform position Gameobject.transform.position += new Vector3(0, -1, 0).
+    // Mueve todos los GameObjects en la fila Y a la fila Y-1
     public static void DecreaseRow(int y)
     {
         for (int x = 0; x < w; ++x)
         {
-            if (grid[x, y] != null)
+            if (grid[x, y].activeSelf)
             {
-                grid[x, y].transform.position += new Vector3(0, -1, 0);
-                grid[x, y - 1] = grid[x, y];
-                grid[x, y] = null;
+                grid[x, y].SetActive(false);
+                grid[x, y - 1].SetActive(true);
             }
         }
-        Debug.Log("Decreased row " + y);
     }
 
-    // TODO: Decreases all rows above Y
+    // Disminuye todas las filas por encima de Y
     public static void DecreaseRowsAbove(int y)
     {
         for (int row = y + 1; row < h; ++row)
         {
-            DecreaseRow(row);
+            for (int x = 0; x < w; ++x)
+            {
+                DecreaseRow(row);
+            }
         }
-        Debug.Log("Decreased rows above " + y);
     }
 
-    // TODO: Return true if all cells in a row have a GameObject (are not null), false otherwise
+    // Devuelve true si todas las celdas en una fila tienen un GameObject (no son null), false en caso contrario
     public static bool IsRowFull(int y)
     {
         for (int x = 0; x < w; x++)
@@ -108,7 +102,7 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    // Deletes full rows
+    // Elimina las filas completas
     public static void DeleteFullRows()
     {
         for (int y = 0; y < h; ++y)
@@ -118,11 +112,12 @@ public class Board : MonoBehaviour
                 DeleteRow(y);
                 DecreaseRowsAbove(y);
                 --y;
+                Spawner.fallSpeed *= 0.9f; // Decrementar la velocidad de caída
             }
         }
-        Debug.Log("Deleted full rows");
     }
 
+    // Devuelve true si la posición actual de la pieza hace que la cuadrícula sea válida o no
     public static bool IsValidBoard(Vector2 pos, Transform pieceTransform)
     {
         if (!InsideBorder(pos))

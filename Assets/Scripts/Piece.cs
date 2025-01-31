@@ -79,7 +79,7 @@ public class Piece : MonoBehaviour
         }
 
         // Implementar mover hacia abajo y caer (cada segundo)
-        if (Input.GetKeyDown(KeyCode.DownArrow) || Time.time - lastFall >= 1)
+        if (Input.GetKeyDown(KeyCode.DownArrow) || Time.time - lastFall >= Spawner.fallSpeed)
         {
             MovePiece(new Vector3(0, -1, 0));
             lastFall = Time.time;
@@ -102,6 +102,12 @@ public class Piece : MonoBehaviour
             }
         }
         Debug.Log("Updated board");
+
+        foreach (Transform child in transform)
+        {
+            Vector2 v = Board.RoundVector2(child.position);
+            //Board.grid[(int)v.x, (int)v.y] = child.gameObject;
+        }
     }
 
     // Devuelve si la posición actual de la pieza hace que la cuadrícula sea válida o no
